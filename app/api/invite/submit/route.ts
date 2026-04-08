@@ -21,57 +21,24 @@ export async function POST(request: Request) {
       );
     }
 
-    // Look up the invite
-    const { data: invite, error: fetchError } = await supabase
-      .from("invites")
-      .select("*")
-      .eq("invite_code", code)
-      .single();
+    // Use database function to handle everything atomically (bypasses RLS)
+    const { data, error: rpcError } = await supabase.rpc(
+      "submit_invite_birthday",
+      { invite_code_input: code, birthday_input: birthday }
+    );
 
-    if (fetchError || !invite) {
+    if (rpcError) {
+      console.error("RPC error:", rpcError);
       return NextResponse.json(
-        { error: "Invite not found" },
-        { status: 404 }
-      );
-    }
-
-    if (invite.status !== "pending") {
-      return NextResponse.json(
-        { error: "expired" },
-        { status: 410 }
-      );
-    }
-
-    // Update the friend's birthday FIRST (while invite is still 'pending' for RLS)
-    if (invite.friend_id) {
-      const { error: updateFriendError } = await supabase
-        .from("friends")
-        .update({
-          birthday,
-          birthday_source: "invite",
-        })
-        .eq("id", invite.friend_id);
-
-      if (updateFriendError) {
-        console.error("Update friend error:", updateFriendError);
-      }
-    }
-
-    // Then mark the invite as completed
-    const { error: updateInviteError } = await supabase
-      .from("invites")
-      .update({
-        status: "completed",
-        birthday_submitted: birthday,
-        completed_at: new Date().toISOString(),
-      })
-      .eq("id", invite.id);
-
-    if (updateInviteError) {
-      console.error("Update invite error:", updateInviteError);
-      return NextResponse.json(
-        { error: "Failed to update invite" },
+        { error: "Failed to submit birthday" },
         { status: 500 }
+      );
+    }
+
+    if (!data?.success) {
+      return NextResponse.json(
+        { error: data?.error === "not_found" ? "expired" : "Failed" },
+        { status: 410 }
       );
     }
 
