@@ -42,7 +42,22 @@ export async function POST(request: Request) {
       );
     }
 
-    // Update the invite
+    // Update the friend's birthday FIRST (while invite is still 'pending' for RLS)
+    if (invite.friend_id) {
+      const { error: updateFriendError } = await supabase
+        .from("friends")
+        .update({
+          birthday,
+          birthday_source: "invite",
+        })
+        .eq("id", invite.friend_id);
+
+      if (updateFriendError) {
+        console.error("Update friend error:", updateFriendError);
+      }
+    }
+
+    // Then mark the invite as completed
     const { error: updateInviteError } = await supabase
       .from("invites")
       .update({
@@ -58,22 +73,6 @@ export async function POST(request: Request) {
         { error: "Failed to update invite" },
         { status: 500 }
       );
-    }
-
-    // Update the friend's birthday if friend_id exists
-    if (invite.friend_id) {
-      const { error: updateFriendError } = await supabase
-        .from("friends")
-        .update({
-          birthday,
-          birthday_source: "invite",
-        })
-        .eq("id", invite.friend_id);
-
-      if (updateFriendError) {
-        console.error("Update friend error:", updateFriendError);
-        // Non-fatal — invite is already marked complete
-      }
     }
 
     return NextResponse.json({ success: true });
