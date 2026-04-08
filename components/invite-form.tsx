@@ -140,7 +140,7 @@ export function InviteForm({ inviteCode, senderName, language }: InviteFormProps
           value={birthday}
           onChange={(e) => setBirthday(e.target.value)}
           required
-          className="w-full px-4 py-3 bg-white border-2 border-border rounded-xl font-body text-lg text-text-primary focus:border-accent-red focus:outline-none transition-colors"
+          className="w-full px-4 py-3 bg-white border-2 border-border rounded-xl font-body text-lg text-text-primary focus:border-accent-red focus:outline-none transition-colors box-border"
         />
       </div>
 
