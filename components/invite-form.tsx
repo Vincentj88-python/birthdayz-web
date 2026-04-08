@@ -4,7 +4,7 @@ import { useState } from "react";
 
 interface InviteFormProps {
   inviteCode: string;
-  friendName: string;
+  senderName: string;
   language: string;
 }
 
@@ -37,7 +37,7 @@ const t = {
   },
 };
 
-export function InviteForm({ inviteCode, friendName, language }: InviteFormProps) {
+export function InviteForm({ inviteCode, senderName, language }: InviteFormProps) {
   const [birthday, setBirthday] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -83,7 +83,7 @@ export function InviteForm({ inviteCode, friendName, language }: InviteFormProps
           {text.successTitle}
         </h2>
         <p className="text-text-secondary text-lg">
-          {text.successMessage.replace("{name}", friendName)}
+          {text.successMessage.replace("{name}", senderName)}
         </p>
 
         <div className="bg-surface border border-border rounded-2xl p-6 mt-8 space-y-4">
@@ -118,6 +118,15 @@ export function InviteForm({ inviteCode, friendName, language }: InviteFormProps
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="text-center mb-2">
+        <p className="text-accent-gold font-body font-bold text-xl">
+          {senderName}
+        </p>
+        <h2 className="font-heading text-2xl font-bold text-text-primary mt-1">
+          {text.heading}
+        </h2>
+        <p className="text-text-secondary mt-2">{text.subtext}</p>
+      </div>
       <div>
         <label
           htmlFor="birthday"

@@ -135,19 +135,9 @@ export default async function InvitePage({ params, searchParams }: PageProps) {
 
         {/* Card */}
         <div className="bg-surface border border-border rounded-3xl p-6 md:p-8 shadow-xl shadow-accent-gold/5">
-          <div className="text-center mb-6">
-            <p className="text-accent-gold font-body font-bold text-xl">
-              {senderName}
-            </p>
-            <h2 className="font-heading text-2xl font-bold text-text-primary mt-1">
-              {t.heading}
-            </h2>
-            <p className="text-text-secondary mt-2">{t.subtext}</p>
-          </div>
-
           <InviteForm
             inviteCode={code}
-            friendName={senderName}
+            senderName={senderName}
             language={lang}
           />
         </div>
